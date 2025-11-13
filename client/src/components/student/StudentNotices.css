@@ -1,0 +1,274 @@
+/* Student Notices */
+.student-notices {
+  padding: 0;
+}
+
+.notices-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.notices-header h2 {
+  color: #2d3748;
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.refresh-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+}
+
+/* Filters */
+.notices-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.notices-filters button {
+  background: white;
+  border: 2px solid #e2e8f0;
+  color: #4a5568;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.notices-filters button:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.notices-filters button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Notices List */
+.notices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notice-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s;
+  border-left: 4px solid #cbd5e0;
+}
+
+.notice-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateX(4px);
+}
+
+.notice-card.priority-urgent {
+  border-left-color: #f56565;
+  background: #fff5f5;
+}
+
+.notice-card.priority-high {
+  border-left-color: #ed8936;
+}
+
+.notice-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.notice-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.notice-title-section {
+  flex: 1;
+}
+
+.notice-title-section h3 {
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+}
+
+.notice-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-urgent {
+  background: #f56565;
+  color: white;
+}
+
+.badge-high {
+  background: #ed8936;
+  color: white;
+}
+
+.badge-normal {
+  background: #4299e1;
+  color: white;
+}
+
+.badge-low {
+  background: #cbd5e0;
+  color: #4a5568;
+}
+
+.badge-category {
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+.notice-date {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.notice-author {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.notice-preview {
+  color: #4a5568;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.notice-expiry {
+  color: #718096;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Notice Modal */
+.notice-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.notice-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #e2e8f0;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #4a5568;
+}
+
+.close-btn:hover {
+  background: #cbd5e0;
+}
+
+.notice-detail {
+  padding: 2rem;
+}
+
+.notice-detail-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.notice-icon-large {
+  font-size: 3rem;
+}
+
+.notice-detail-header h2 {
+  color: #2d3748;
+  margin: 0 0 0.75rem 0;
+}
+
+.notice-detail-content {
+  margin: 1.5rem 0;
+  color: #4a5568;
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.notice-detail-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e2e8f0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.no-notices {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.no-notices p {
+  color: #718096;
+  font-size: 1.1rem;
+}

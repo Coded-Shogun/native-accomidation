@@ -1,0 +1,188 @@
+@import './StudentComponents.css';
+
+/* Student Laundry Specific Styles */
+.student-laundry {
+  padding: 0;
+}
+
+.machines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.machine-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  border-left: 4px solid #cbd5e0;
+}
+
+.machine-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.machine-card.machine-available {
+  border-left-color: #48bb78;
+}
+
+.machine-card.machine-in_use {
+  border-left-color: #ed8936;
+}
+
+.machine-card.machine-maintenance,
+.machine-card.machine-out_of_order {
+  border-left-color: #f56565;
+  opacity: 0.7;
+}
+
+.machine-card.current-user {
+  border-left-color: #667eea;
+  background: #f7fafc;
+}
+
+.machine-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.machine-icon {
+  font-size: 2.5rem;
+}
+
+.machine-info h3 {
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+}
+
+.machine-details {
+  color: #4a5568;
+}
+
+.machine-type {
+  color: #718096;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.machine-in-use {
+  background: #feebc8;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.machine-in-use.current-user-info {
+  background: #e6fffa;
+}
+
+.user-label {
+  color: #276749;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.time-remaining {
+  margin: 1rem 0;
+}
+
+.timer {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  background: #e2e8f0;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #48bb78, #38a169);
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.machine-unavailable {
+  color: #718096;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Queue Section */
+.queue-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.queue-section h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.queue-position {
+  background: #667eea;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.queue-info {
+  flex: 1;
+}
+
+.queue-machine {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.queue-status {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+/* Duration Options Modal */
+.duration-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.duration-options button {
+  padding: 1rem;
+  font-size: 1.1rem;
+}

@@ -1,0 +1,206 @@
+@import './StudentComponents.css';
+
+/* Student WiFi Specific Styles */
+.student-wifi {
+  padding: 0;
+}
+
+.current-wifi {
+  border-left: 4px solid #4299e1;
+}
+
+.wifi-card h3 {
+  color: #2d3748;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.network-name {
+  font-size: 1.25rem;
+  color: #2d3748;
+}
+
+.password-value {
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+}
+
+.credential-validity {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.validity-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.validity-row .label {
+  color: #718096;
+  font-weight: 500;
+}
+
+.validity-row .value {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.validity-row .value.expiring {
+  color: #ed8936;
+}
+
+/* WiFi Instructions */
+.wifi-instructions {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wifi-instructions h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.wifi-instructions ol {
+  color: #4a5568;
+  line-height: 2;
+  padding-left: 1.5rem;
+}
+
+.wifi-instructions li {
+  margin-bottom: 0.5rem;
+}
+
+/* WiFi History */
+.wifi-history {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wifi-history h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 4px solid #cbd5e0;
+}
+
+.history-item.status-current {
+  border-left-color: #48bb78;
+  background: #f0fff4;
+}
+
+.history-item.status-upcoming {
+  border-left-color: #4299e1;
+  background: #ebf8ff;
+}
+
+.history-item.status-expired {
+  opacity: 0.6;
+}
+
+.history-network {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.history-dates {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.badge-current {
+  background: #48bb78;
+  color: white;
+}
+
+.badge-upcoming {
+  background: #4299e1;
+  color: white;
+}
+
+.badge-expired {
+  background: #cbd5e0;
+  color: #4a5568;
+}
+
+.badge-inactive {
+  background: #e2e8f0;
+  color: #718096;
+}
+
+/* WiFi Support */
+.wifi-support {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wifi-support h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.wifi-support p {
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.wifi-support ul {
+  color: #4a5568;
+  line-height: 1.8;
+  padding-left: 1.5rem;
+}
+
+.wifi-support li {
+  margin-bottom: 0.5rem;
+}
+
+/* Error Card */
+.error-card {
+  background: white;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-card h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.error-card p {
+  color: #718096;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}

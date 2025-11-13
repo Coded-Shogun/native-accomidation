@@ -1,0 +1,88 @@
+@import './StudentComponents.css';
+
+/* Student Visitors Specific Styles */
+.student-visitors {
+  padding: 0;
+}
+
+.visitors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.visitor-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+}
+
+.visitor-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.visitor-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.visitor-icon {
+  font-size: 2.5rem;
+}
+
+.visitor-info h4 {
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+}
+
+.visitor-details {
+  margin-top: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.detail-row .label {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.detail-row .value {
+  color: #2d3748;
+  font-weight: 500;
+  text-align: right;
+}
+
+.access-code {
+  background: #e6fffa;
+  border-left: 4px solid #38b2ac;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.access-code .code {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #234e52;
+  letter-spacing: 0.2rem;
+}
+
+.visitor-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #f7fafc;
+}
