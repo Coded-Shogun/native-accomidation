@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; }
+    .container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #1e40af, #2563eb); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { font-size: 16px; opacity: 0.9; }
+    .content { padding: 40px 30px; }
+    .content h2 { color: #1e40af; margin-bottom: 20px; font-size: 24px; }
+    .content p { margin-bottom: 15px; color: #4b5563; }
+    .info-box { background: #eff6ff; border-left: 4px solid #2563eb; padding: 20px; margin: 25px 0; border-radius: 4px; }
+    .info-box strong { color: #1e40af; display: block; margin-bottom: 8px; }
+    .features { list-style: none; padding: 0; margin: 25px 0; }
+    .features li { padding: 12px 0 12px 30px; position: relative; color: #4b5563; }
+    .features li:before { content: "✓"; position: absolute; left: 0; color: #10b981; font-weight: bold; font-size: 18px; }
+    .button { display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; margin: 25px 0; font-weight: 500; transition: background 0.3s; }
+    .button:hover { background: #1d4ed8; }
+    .footer { background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .footer p { color: #6b7280; font-size: 14px; margin: 5px 0; }
+    .footer a { color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏠 Welcome to Your New Home!</h1>
+      <p>Student Accommodation Management System</p>
+    </div>
+
+    <div class="content">
+      <h2>Hello {{firstName}} {{lastName}}! 👋</h2>
+
+      <p>Welcome to our student accommodation community at <strong>{{institution}}</strong>. We're excited to have you with us and committed to making your stay comfortable and convenient.</p>
+
+      <div class="info-box">
+        <strong>Your Account Details:</strong>
+        <p style="margin: 8px 0 0 0;">
+          <strong>Student Number:</strong> {{studentNumber}}<br>
+          <strong>Email:</strong> {{email}}
+        </p>
+      </div>
+
+      <p><strong>What you can do with your student portal:</strong></p>
+      <ul class="features">
+        <li>View your lease details and room information</li>
+        <li>Submit and track maintenance requests</li>
+        <li>Check laundry machine availability in real-time</li>
+        <li>Access the latest WiFi password</li>
+        <li>Register visitors and guests</li>
+        <li>Browse the digital common area and notice board</li>
+        <li>Report complaints and provide feedback</li>
+        <li>Track your package deliveries</li>
+        <li>Shop at the virtual kiosk</li>
+      </ul>
+
+      <center>
+        <a href="http://localhost:3000/student/login" class="button">Access Your Student Portal →</a>
+      </center>
+
+      <p style="margin-top: 30px;"><strong>Need Help?</strong></p>
+      <p>If you have any questions or need assistance, our management team is here to help. You can:</p>
+      <ul class="features">
+        <li>Submit a complaint through your portal</li>
+        <li>Contact us via the notice board</li>
+        <li>Visit the management office during business hours</li>
+      </ul>
+
+      <p style="margin-top: 30px;">We hope you have a wonderful stay!</p>
+
+      <p style="margin-top: 20px;">
+        <strong>Best regards,</strong><br>
+        Student Accommodation Management Team
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>© 2025 Student Accommodation Manager. All rights reserved.</p>
+      <p>This email was sent to {{email}}</p>
+      <p><a href="#">Unsubscribe</a> | <a href="#">Privacy Policy</a></p>
+    </div>
+  </div>
+</body>
+</html>

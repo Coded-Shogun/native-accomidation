@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Update</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; }
+    .container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .content { padding: 40px 30px; }
+    .content h2 { color: #059669; margin-bottom: 20px; }
+    .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; margin: 10px 0; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-in_progress, .status-in-progress { background: #dbeafe; color: #1e40af; }
+    .status-open { background: #fef3c7; color: #92400e; }
+    .priority-urgent { color: #ef4444; }
+    .priority-high { color: #f59e0b; }
+    .info-table { width: 100%; margin: 25px 0; border-collapse: collapse; }
+    .info-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+    .info-table td:first-child { font-weight: 600; color: #4b5563; width: 40%; }
+    .info-table tr:last-child td { border-bottom: none; }
+    .footer { background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .footer p { color: #6b7280; font-size: 14px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔧 Maintenance Update</h1>
+      <p>Request #{{requestId}}</p>
+    </div>
+
+    <div class="content">
+      <h2>Hello {{firstName}}!</h2>
+      <p>Your maintenance request has been updated.</p>
+
+      <table class="info-table">
+        <tr>
+          <td>Request ID</td>
+          <td><strong>#{{requestId}}</strong></td>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td>{{title}}</td>
+        </tr>
+        <tr>
+          <td>Category</td>
+          <td style="text-transform: capitalize;">{{category}}</td>
+        </tr>
+        <tr>
+          <td>Priority</td>
+          <td class="priority-{{priority}}" style="text-transform: uppercase;">{{priority}}</td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>
+            <span class="status-badge status-{{status}}">{{status}}</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Reported Date</td>
+          <td>{{reportedDate}}</td>
+        </tr>
+      </table>
+
+      <p><strong>Description:</strong></p>
+      <p style="padding: 15px; background: #f9fafb; border-radius: 6px; margin: 15px 0;">{{description}}</p>
+
+      <p style="margin-top: 25px;">We'll keep you updated on the progress. Thank you for your patience!</p>
+
+      <p style="margin-top: 25px;">
+        <strong>Best regards,</strong><br>
+        Maintenance Team
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>© 2025 Student Accommodation Manager</p>
+    </div>
+  </div>
+</body>
+</html>

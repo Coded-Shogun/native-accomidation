@@ -4,6 +4,7 @@ const path = require('path');
 
 const DB_PATH = process.env.DB_PATH || './database/accommodation.db';
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
+const SCHEMA_EXTENSIONS_PATH = path.join(__dirname, 'schema-extensions.sql');
 
 // Ensure database directory exists
 const dbDir = path.dirname(DB_PATH);
@@ -25,13 +26,29 @@ const initDatabase = () => {
     return new Promise((resolve, reject) => {
         const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
 
+        // First, run base schema
         db.exec(schema, (err) => {
             if (err) {
                 console.error('Error initializing database schema:', err.message);
                 reject(err);
             } else {
-                console.log('Database schema initialized successfully');
-                resolve();
+                console.log('Base database schema initialized successfully');
+
+                // Then, run schema extensions if file exists
+                if (fs.existsSync(SCHEMA_EXTENSIONS_PATH)) {
+                    const schemaExtensions = fs.readFileSync(SCHEMA_EXTENSIONS_PATH, 'utf8');
+                    db.exec(schemaExtensions, (extErr) => {
+                        if (extErr) {
+                            console.error('Error initializing schema extensions:', extErr.message);
+                            reject(extErr);
+                        } else {
+                            console.log('Schema extensions initialized successfully');
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
             }
         });
     });

@@ -67,6 +67,15 @@ app.use('/api/facilities', require('./routes/facilities'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 
+// Student Portal Routes
+app.use('/api/student/notices', require('./routes/student/notices'));
+app.use('/api/student/laundry', require('./routes/student/laundry'));
+app.use('/api/student/visitors', require('./routes/student/visitors'));
+app.use('/api/student/complaints', require('./routes/student/complaints'));
+app.use('/api/student/kiosk', require('./routes/student/kiosk'));
+app.use('/api/student/wifi', require('./routes/student/wifi'));
+app.use('/api/student/deliveries', require('./routes/student/deliveries'));
+
 // 404 handler
 app.use(notFoundHandler);
 

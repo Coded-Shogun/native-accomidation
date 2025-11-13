@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; }
+    .container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .content { padding: 40px 30px; }
+    .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 4px; }
+    .button { display: inline-block; background: #ef4444; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; margin: 25px 0; font-weight: 500; }
+    .footer { background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚠️ Lease Expiration Reminder</h1>
+      <p>{{daysRemaining}} Days Remaining</p>
+    </div>
+    <div class="content">
+      <h2>Hello {{firstName}}!</h2>
+      <p>This is a reminder that your lease is expiring soon.</p>
+
+      <div class="warning-box">
+        <strong style="color: #92400e; font-size: 18px;">{{daysRemaining}} days remaining</strong>
+        <p style="margin-top: 10px; color: #78350f;">Your lease will expire on <strong>{{leaseEndDate}}</strong></p>
+      </div>
+
+      <p><strong>Lease Details:</strong></p>
+      <p>Property: {{propertyName}}<br>
+      Room: {{roomNumber}}<br>
+      Monthly Amount: R{{monthlyAmount}}</p>
+
+      <p style="margin-top: 25px;"><strong>What to do next:</strong></p>
+      <ul style="list-style: none; padding-left: 0;">
+        <li style="padding: 8px 0;">✓ Contact management to renew your lease</li>
+        <li style="padding: 8px 0;">✓ Arrange a move-out inspection if leaving</li>
+        <li style="padding: 8px 0;">✓ Ensure all payments are up to date</li>
+      </ul>
+
+      <center>
+        <a href="http://localhost:3000/student/lease" class="button">View Lease Details →</a>
+      </center>
+    </div>
+    <div class="footer">
+      <p>© 2025 Student Accommodation Manager</p>
+    </div>
+  </div>
+</body>
+</html>
