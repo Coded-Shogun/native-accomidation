@@ -76,6 +76,12 @@ app.use('/api/student/kiosk', require('./routes/student/kiosk'));
 app.use('/api/student/wifi', require('./routes/student/wifi'));
 app.use('/api/student/deliveries', require('./routes/student/deliveries'));
 
+// Management Portal Routes - Bursary System
+app.use('/api/management/bursary-providers', require('./routes/management/bursary-providers'));
+app.use('/api/management/student-bursaries', require('./routes/management/student-bursaries'));
+app.use('/api/management/bursary-reports', require('./routes/management/bursary-reports'));
+app.use('/api/management/residence-verification', require('./routes/management/residence-verification'));
+
 // 404 handler
 app.use(notFoundHandler);
 

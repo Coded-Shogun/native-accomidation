@@ -288,3 +288,219 @@ CREATE INDEX IF NOT EXISTS idx_iot_devices_property ON iot_devices(property_id);
 CREATE INDEX IF NOT EXISTS idx_iot_readings_device ON iot_readings(device_id);
 CREATE INDEX IF NOT EXISTS idx_student_sessions_student ON student_sessions(student_id);
 CREATE INDEX IF NOT EXISTS idx_student_sessions_active ON student_sessions(is_active);
+
+-- ============================================================================
+-- BURSARY MANAGEMENT & REPORTING SYSTEM
+-- ============================================================================
+
+-- Bursary Providers (NSFAS and other funding organizations)
+CREATE TABLE IF NOT EXISTS bursary_providers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    type TEXT CHECK(type IN ('government', 'corporate', 'ngo', 'university', 'private', 'other')) NOT NULL,
+    contact_person TEXT,
+    contact_email TEXT,
+    contact_phone TEXT,
+    requirements TEXT, -- JSON: list of requirements/metrics to track
+    reporting_frequency TEXT CHECK(reporting_frequency IN ('weekly', 'monthly', 'quarterly', 'semester', 'annual')) DEFAULT 'monthly',
+    report_template TEXT, -- JSON: template configuration
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Student Bursaries (links students to their funding sources)
+CREATE TABLE IF NOT EXISTS student_bursaries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    bursary_provider_id INTEGER NOT NULL,
+    bursary_reference TEXT UNIQUE NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT DEFAULT 'ZAR',
+    academic_year TEXT NOT NULL, -- e.g., '2025'
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status TEXT CHECK(status IN ('pending', 'active', 'suspended', 'completed', 'cancelled')) DEFAULT 'active',
+    conditions TEXT, -- JSON: specific conditions for this bursary
+    payment_schedule TEXT, -- JSON: payment schedule/milestones
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (bursary_provider_id) REFERENCES bursary_providers(id) ON DELETE CASCADE
+);
+
+-- Bursary Requirements (metrics that need to be tracked)
+CREATE TABLE IF NOT EXISTS bursary_requirements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bursary_provider_id INTEGER NOT NULL,
+    requirement_type TEXT NOT NULL, -- e.g., 'attendance', 'academic_performance', 'conduct', 'residence_verification'
+    requirement_name TEXT NOT NULL,
+    description TEXT,
+    metric_type TEXT CHECK(metric_type IN ('percentage', 'count', 'boolean', 'grade', 'text')) NOT NULL,
+    threshold_value TEXT, -- Minimum acceptable value
+    frequency TEXT CHECK(frequency IN ('daily', 'weekly', 'monthly', 'semester', 'annual')) NOT NULL,
+    is_mandatory BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bursary_provider_id) REFERENCES bursary_providers(id) ON DELETE CASCADE
+);
+
+-- Residence Verification (proof of staying at accommodation)
+CREATE TABLE IF NOT EXISTS residence_verifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    property_id INTEGER NOT NULL,
+    verification_date DATE NOT NULL,
+    verification_type TEXT CHECK(verification_type IN ('checkin', 'weekly', 'monthly', 'random', 'audit')) NOT NULL,
+    verified_by INTEGER,
+    verification_method TEXT CHECK(verification_method IN ('physical', 'biometric', 'access_log', 'photo', 'video', 'other')) NOT NULL,
+    is_present BOOLEAN NOT NULL,
+    notes TEXT,
+    evidence_url TEXT, -- URL to photo/video evidence
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+    FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Academic Performance Tracking (for bursary requirements)
+CREATE TABLE IF NOT EXISTS academic_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    academic_year TEXT NOT NULL,
+    semester TEXT NOT NULL,
+    course_name TEXT NOT NULL,
+    course_code TEXT,
+    credits INTEGER,
+    grade TEXT,
+    percentage REAL,
+    status TEXT CHECK(status IN ('passed', 'failed', 'in_progress', 'dropped', 'deferred')) NOT NULL,
+    submitted_date DATE,
+    verified_by INTEGER,
+    verification_date DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Student Conduct Records (disciplinary issues for bursary compliance)
+CREATE TABLE IF NOT EXISTS conduct_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    property_id INTEGER NOT NULL,
+    incident_date DATE NOT NULL,
+    incident_type TEXT CHECK(incident_type IN ('noise', 'damage', 'violation', 'dispute', 'safety', 'other')) NOT NULL,
+    severity TEXT CHECK(severity IN ('minor', 'moderate', 'serious', 'critical')) NOT NULL,
+    description TEXT NOT NULL,
+    action_taken TEXT,
+    resolved BOOLEAN DEFAULT 0,
+    resolved_date DATE,
+    reported_by INTEGER,
+    notes TEXT,
+    affects_bursary BOOLEAN DEFAULT 0, -- Flag if this affects bursary eligibility
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+    FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Bursary Reports (generated reports for bursary providers)
+CREATE TABLE IF NOT EXISTS bursary_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    bursary_provider_id INTEGER NOT NULL,
+    report_period_start DATE NOT NULL,
+    report_period_end DATE NOT NULL,
+    report_type TEXT CHECK(report_type IN ('individual', 'aggregate', 'compliance', 'financial', 'custom')) NOT NULL,
+    status TEXT CHECK(status IN ('draft', 'pending_review', 'approved', 'sent', 'archived')) DEFAULT 'draft',
+    total_students INTEGER,
+    compliant_students INTEGER,
+    non_compliant_students INTEGER,
+    report_data TEXT, -- JSON: detailed report data
+    report_file_url TEXT, -- URL to PDF/Excel report
+    generated_by INTEGER,
+    generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INTEGER,
+    reviewed_at DATETIME,
+    sent_at DATETIME,
+    notes TEXT,
+    FOREIGN KEY (bursary_provider_id) REFERENCES bursary_providers(id) ON DELETE CASCADE,
+    FOREIGN KEY (generated_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Bursary Report Items (individual student entries in reports)
+CREATE TABLE IF NOT EXISTS bursary_report_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    report_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    student_bursary_id INTEGER NOT NULL,
+    compliance_status TEXT CHECK(compliance_status IN ('compliant', 'warning', 'non_compliant')) NOT NULL,
+    attendance_rate REAL, -- Percentage
+    residence_verified BOOLEAN,
+    academic_status TEXT,
+    conduct_status TEXT CHECK(conduct_status IN ('good', 'warning', 'poor')) DEFAULT 'good',
+    issues_count INTEGER DEFAULT 0,
+    metrics TEXT, -- JSON: all tracked metrics for this student
+    recommendations TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (report_id) REFERENCES bursary_reports(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_bursary_id) REFERENCES student_bursaries(id) ON DELETE CASCADE
+);
+
+-- Bursary Compliance Alerts
+CREATE TABLE IF NOT EXISTS bursary_compliance_alerts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    student_bursary_id INTEGER NOT NULL,
+    alert_type TEXT CHECK(alert_type IN ('attendance', 'residence', 'academic', 'conduct', 'payment', 'other')) NOT NULL,
+    severity TEXT CHECK(severity IN ('info', 'warning', 'critical')) NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    status TEXT CHECK(status IN ('open', 'acknowledged', 'resolved', 'escalated')) DEFAULT 'open',
+    acknowledged_by INTEGER,
+    acknowledged_at DATETIME,
+    resolved_at DATETIME,
+    resolution_notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_bursary_id) REFERENCES student_bursaries(id) ON DELETE CASCADE,
+    FOREIGN KEY (acknowledged_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Bursary Access Logs (who accessed which bursary reports)
+CREATE TABLE IF NOT EXISTS bursary_access_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    bursary_provider_id INTEGER,
+    report_id INTEGER,
+    student_id INTEGER,
+    action TEXT NOT NULL, -- e.g., 'view_report', 'download_report', 'view_student', 'export_data'
+    ip_address TEXT,
+    user_agent TEXT,
+    accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (bursary_provider_id) REFERENCES bursary_providers(id) ON DELETE SET NULL,
+    FOREIGN KEY (report_id) REFERENCES bursary_reports(id) ON DELETE SET NULL,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
+);
+
+-- Create indexes for bursary tables
+CREATE INDEX IF NOT EXISTS idx_student_bursaries_student ON student_bursaries(student_id);
+CREATE INDEX IF NOT EXISTS idx_student_bursaries_provider ON student_bursaries(bursary_provider_id);
+CREATE INDEX IF NOT EXISTS idx_student_bursaries_status ON student_bursaries(status);
+CREATE INDEX IF NOT EXISTS idx_bursary_requirements_provider ON bursary_requirements(bursary_provider_id);
+CREATE INDEX IF NOT EXISTS idx_residence_verifications_student ON residence_verifications(student_id);
+CREATE INDEX IF NOT EXISTS idx_residence_verifications_date ON residence_verifications(verification_date);
+CREATE INDEX IF NOT EXISTS idx_academic_records_student ON academic_records(student_id);
+CREATE INDEX IF NOT EXISTS idx_academic_records_year ON academic_records(academic_year);
+CREATE INDEX IF NOT EXISTS idx_conduct_records_student ON conduct_records(student_id);
+CREATE INDEX IF NOT EXISTS idx_conduct_records_date ON conduct_records(incident_date);
+CREATE INDEX IF NOT EXISTS idx_bursary_reports_provider ON bursary_reports(bursary_provider_id);
+CREATE INDEX IF NOT EXISTS idx_bursary_reports_status ON bursary_reports(status);
+CREATE INDEX IF NOT EXISTS idx_bursary_report_items_report ON bursary_report_items(report_id);
+CREATE INDEX IF NOT EXISTS idx_bursary_report_items_student ON bursary_report_items(student_id);
+CREATE INDEX IF NOT EXISTS idx_bursary_compliance_alerts_student ON bursary_compliance_alerts(student_id);
+CREATE INDEX IF NOT EXISTS idx_bursary_compliance_alerts_status ON bursary_compliance_alerts(status);
+CREATE INDEX IF NOT EXISTS idx_bursary_access_logs_user ON bursary_access_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_bursary_access_logs_accessed_at ON bursary_access_logs(accessed_at);
