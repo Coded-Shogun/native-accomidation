@@ -45,12 +45,33 @@ A comprehensive NSFAS-compliant student accommodation management system designed
   - Inspection scheduling
   - Compliance reporting
 
+- **Bursary Management System** ⭐ NEW
+  - Manage funding organizations (NSFAS, corporate sponsors, NGOs)
+  - Assign and track student bursaries
+  - Record residence verifications for NSFAS compliance
+  - Automated compliance calculation (attendance, academic, conduct)
+  - Generate compliance reports for bursary providers
+  - Real-time compliance alerts and monitoring
+  - Support for multiple bursary providers per student
+
+- **Student Portal**
+  - View accommodation and lease details
+  - Submit and track maintenance requests
+  - Access notices and announcements
+  - Manage laundry bookings
+  - Register visitors
+  - Lodge complaints
+  - View WiFi access information
+  - Track parcel deliveries
+  - Self-service kiosk management
+
 - **Dashboard & Reporting**
   - Real-time statistics
   - Occupancy rates
   - Maintenance summaries
   - Compliance scores
   - Upcoming lease expirations
+  - Bursary compliance dashboard
 
 ## NSFAS Requirements Addressed
 
@@ -218,6 +239,51 @@ npm start
 - `GET /api/dashboard/overview` - Get dashboard statistics
 - `GET /api/dashboard/property/:property_id` - Get property-specific dashboard
 
+### Bursary Providers
+
+- `GET /api/management/bursary-providers` - Get all bursary providers
+- `GET /api/management/bursary-providers/:id` - Get provider by ID with requirements
+- `POST /api/management/bursary-providers` - Create new provider
+- `PUT /api/management/bursary-providers/:id` - Update provider
+- `POST /api/management/bursary-providers/:id/requirements` - Add requirement to provider
+
+### Student Bursaries
+
+- `GET /api/management/student-bursaries` - Get all student bursaries (filterable)
+- `GET /api/management/student-bursaries/:id` - Get bursary details with alerts
+- `POST /api/management/student-bursaries` - Assign new bursary to student
+- `PUT /api/management/student-bursaries/:id/status` - Update bursary status
+- `GET /api/management/student-bursaries/stats/summary` - Get summary statistics
+
+### Residence Verification
+
+- `GET /api/management/residence-verification` - Get verification history
+- `GET /api/management/residence-verification/student/:id` - Get student verifications
+- `POST /api/management/residence-verification` - Record single verification
+- `POST /api/management/residence-verification/bulk` - Bulk verify from access logs
+
+### Bursary Reports
+
+- `GET /api/management/bursary-reports` - Get all reports (filterable)
+- `GET /api/management/bursary-reports/:id` - Get report details
+- `POST /api/management/bursary-reports/generate` - Generate new compliance report
+- `PUT /api/management/bursary-reports/:id/status` - Update report status
+
+### Student Portal
+
+- `GET /api/student/accommodation` - Get student's accommodation details
+- `GET /api/student/maintenance-requests` - Get student's maintenance requests
+- `POST /api/student/maintenance-requests` - Submit new maintenance request
+- `GET /api/student/notices` - Get notices for student's property
+- `GET /api/student/laundry-bookings` - Get student's laundry bookings
+- `POST /api/student/laundry-bookings` - Create laundry booking
+- `POST /api/student/visitors` - Register visitor
+- `POST /api/student/complaints` - Lodge complaint
+- `GET /api/student/kiosk-orders` - Get student's kiosk orders
+- `POST /api/student/kiosk-orders` - Create kiosk order
+- `GET /api/student/wifi-access` - Get WiFi access information
+- `GET /api/student/deliveries` - Get student's deliveries
+
 ## User Guide
 
 ### Getting Started
@@ -259,6 +325,21 @@ npm start
    - Log student entries and exits
    - Monitor real-time occupancy
 
+8. **Manage Bursaries**
+   - Navigate to "Bursary Management" section
+   - Add bursary providers (NSFAS, etc.)
+   - Assign bursaries to students
+   - Record residence verifications for compliance
+   - Generate reports for bursary providers
+
+9. **Student Portal Access**
+   - Students can access their portal at `/student`
+   - View accommodation details
+   - Submit maintenance requests
+   - Book laundry slots
+   - Register visitors
+   - Track deliveries
+
 ### NSFAS Compliance Checklist
 
 The system tracks these key compliance areas:
@@ -273,6 +354,7 @@ The system tracks these key compliance areas:
 
 The system uses SQLite with the following main tables:
 
+### Core Tables
 - `properties` - Property information and accreditation status
 - `rooms` - Individual rooms and occupancy
 - `students` - Student profiles and eligibility
@@ -282,6 +364,29 @@ The system uses SQLite with the following main tables:
 - `nsfas_compliance` - Compliance tracking
 - `facilities` - Facility inventory and ratios
 - `payments` - Payment history
+
+### Bursary Management Tables
+- `bursary_providers` - Funding organizations (NSFAS, sponsors)
+- `bursary_requirements` - Provider-specific compliance requirements
+- `student_bursaries` - Student funding assignments and tracking
+- `residence_verifications` - Student attendance/residence logs
+- `academic_records` - Student academic performance tracking
+- `conduct_records` - Disciplinary incidents affecting bursaries
+- `bursary_reports` - Generated compliance reports
+- `report_student_data` - Individual student data in reports
+- `bursary_compliance_alerts` - Automated compliance warnings
+- `report_access_logs` - Audit trail for report access
+
+### Student Portal Tables
+- `notices` - Property announcements and notices
+- `laundry_machines` - Washing machine inventory
+- `laundry_bookings` - Student laundry reservations
+- `visitor_registrations` - Registered visitors
+- `student_complaints` - Student-submitted complaints
+- `kiosk_products` - Products available for purchase
+- `kiosk_orders` - Student kiosk orders
+- `wifi_access_points` - WiFi network information
+- `parcel_deliveries` - Student package tracking
 
 ## Troubleshooting
 
@@ -311,16 +416,49 @@ Ensure the proxy is set correctly in `client/package.json`:
 "proxy": "http://localhost:5000"
 ```
 
+## Documentation
+
+### User Guides
+- **[Bursary Management User Guide](docs/BURSARY_MANAGEMENT_USER_GUIDE.md)** - Complete guide for using the bursary management interface
+- **[Bursary Reporting API Guide](docs/BURSARY_REPORTING_GUIDE.md)** - Technical API documentation for bursary reports
+- **[Email Notifications Quick Start](docs/QUICK_START_EMAIL_NOTIFICATIONS.md)** - Setting up email notifications
+- **[Feature Roadmap](docs/FEATURE_ROADMAP.md)** - Planned enhancements and development timeline
+
+### Compliance Documentation
+- **[ISO 27001 Compliance](docs/ISO27001_COMPLIANCE.md)** - Information security compliance details
+- **[SOC 2 Compliance](docs/SOC2_COMPLIANCE.md)** - Service organization control compliance
+- **[Compliance Assessment](docs/COMPLIANCE_ASSESSMENT.md)** - System compliance assessment
+
+## Recently Completed Features ✅
+
+- ✅ Email notification system for students and staff
+- ✅ Comprehensive bursary management system
+- ✅ NSFAS-compliant residence verification tracking
+- ✅ Automated compliance reporting for bursary providers
+- ✅ Student self-service portal with multiple features
+- ✅ Laundry booking system
+- ✅ Visitor registration and tracking
+- ✅ Student complaints management
+- ✅ Kiosk ordering system
+- ✅ Parcel delivery tracking
+- ✅ Real-time compliance alerts
+- ✅ Academic and conduct record tracking
+
 ## Future Enhancements
 
-- Email notifications for maintenance and lease expirations
-- Document upload and management
-- Payment integration with NSFAS
-- Mobile app for students
+- Document upload and management system
+- Payment integration with NSFAS portal
+- Mobile native app for students (iOS/Android)
 - QR code-based access control
-- Advanced reporting and analytics
-- Bulk student import
+- AI-powered predictive analytics
+- Multi-tenancy support for SaaS model
+- Advanced data visualization and reporting
+- Bulk student import functionality
 - Multi-language support
+- WhatsApp Business API integration
+- Virtual property tours
+- Energy and resource management
+- Biometric access integration
 
 ## Contributing
 
