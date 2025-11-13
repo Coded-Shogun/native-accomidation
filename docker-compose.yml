@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Production application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: accommodation-manager
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-change-this-encryption-key!!}
+      - DB_PATH=/app/database/accommodation.db
+      - LOG_LEVEL=info
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - accommodation-network
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:5000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development application (alternative)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: accommodation-manager-dev
+    profiles:
+      - dev
+    ports:
+      - '5000:5000'
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - JWT_SECRET=dev-secret-key
+      - ENCRYPTION_KEY=dev-encryption-key-32-chars!
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/client/node_modules
+    networks:
+      - accommodation-network
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: accommodation-nginx
+    profiles:
+      - production
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - accommodation-network
+
+networks:
+  accommodation-network:
+    driver: bridge
+
+volumes:
+  database-data:
+  logs-data:
+  uploads-data:

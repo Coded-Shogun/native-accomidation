@@ -1,0 +1,45 @@
+schemaVersion: '2.0.0'
+
+# Container Structure Tests for Security Compliance
+
+commandTests:
+  - name: 'Application starts successfully'
+    command: 'node'
+    args: ['--version']
+    expectedOutput: ['v18.*']
+
+  - name: 'Health check endpoint responds'
+    setup: [['node', 'server/index.js', '&'], ['sleep', '5']]
+    command: 'wget'
+    args: ['-q', '-O-', 'http://localhost:5000/api/health']
+    expectedOutput: ['.*OK.*']
+
+fileExistenceTests:
+  - name: 'Required application files exist'
+    path: '/app/server/index.js'
+    shouldExist: true
+
+  - name: 'Package.json exists'
+    path: '/app/package.json'
+    shouldExist: true
+
+  - name: 'Node modules installed'
+    path: '/app/node_modules'
+    shouldExist: true
+
+fileContentTests:
+  - name: 'Node version is correct'
+    path: '/usr/local/bin/node'
+    expectedContents: ['.*v18.*']
+
+metadataTest:
+  env:
+    - key: 'NODE_ENV'
+      value: 'production'
+      isRegex: false
+
+  exposedPorts: ['5000']
+
+  user: 'nodejs'
+
+  workdir: '/app'
