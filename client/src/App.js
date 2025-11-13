@@ -9,6 +9,7 @@ import Properties from './components/Properties';
 import Maintenance from './components/Maintenance';
 import Compliance from './components/Compliance';
 import AccessControl from './components/AccessControl';
+import BursaryManagement from './components/management/BursaryManagement';
 
 // Import student portal
 import StudentPortal from './components/student/StudentPortal';
@@ -35,6 +36,7 @@ function App() {
                     <Link to="/">Dashboard</Link>
                     <Link to="/properties">Properties</Link>
                     <Link to="/students">Students</Link>
+                    <Link to="/bursary">Bursary Management</Link>
                     <Link to="/maintenance">Maintenance</Link>
                     <Link to="/compliance">NSFAS Compliance</Link>
                     <Link to="/access">Access Control</Link>
@@ -49,6 +51,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/students" element={<Students />} />
                     <Route path="/properties" element={<Properties />} />
+                    <Route path="/bursary/*" element={<BursaryManagement />} />
                     <Route path="/maintenance" element={<Maintenance />} />
                     <Route path="/compliance" element={<Compliance />} />
                     <Route path="/access" element={<AccessControl />} />

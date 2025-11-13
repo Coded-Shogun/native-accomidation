@@ -1,0 +1,371 @@
+/* Student Bursaries Component Styles */
+
+.student-bursaries {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Bursaries Table */
+.bursaries-table {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.bursaries-table th,
+.bursaries-table td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.bursaries-table th {
+  background: #f7fafc;
+  font-weight: 600;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.bursaries-table td {
+  border-bottom: 1px solid #f7fafc;
+  color: #4a5568;
+}
+
+.bursaries-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bursaries-table tbody tr:hover {
+  background: #f7fafc;
+}
+
+.student-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.student-number {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.amount-cell {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* No Bursaries State */
+.no-bursaries {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.no-bursaries p {
+  color: #718096;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Bursary Details Page */
+.bursary-details-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.bursary-info-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+.bursary-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #48bb78;
+  margin-bottom: 0.5rem;
+}
+
+.bursary-reference {
+  font-size: 0.9rem;
+  color: #718096;
+  font-family: 'Courier New', monospace;
+}
+
+/* Alerts Section */
+.alerts-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+.alerts-section h3 {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert-item {
+  background: #f7fafc;
+  border-radius: 10px;
+  padding: 1.25rem;
+  border-left: 4px solid;
+}
+
+.alert-item.alert-info {
+  border-left-color: #4299e1;
+}
+
+.alert-item.alert-warning {
+  border-left-color: #ed8936;
+}
+
+.alert-item.alert-critical {
+  border-left-color: #f56565;
+}
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.alert-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.alert-badge.badge-info {
+  background: #4299e1;
+  color: white;
+}
+
+.alert-badge.badge-warning {
+  background: #ed8936;
+  color: white;
+}
+
+.alert-badge.badge-critical {
+  background: #f56565;
+  color: white;
+}
+
+.alert-type {
+  color: #718096;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.alert-title {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.alert-description {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.alert-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.alert-date {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.alert-status {
+  padding: 0.25rem 0.75rem;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #4a5568;
+  text-transform: capitalize;
+}
+
+.no-alerts {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+/* Conduct Records */
+.conduct-records {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.conduct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.conduct-item {
+  background: #f7fafc;
+  border-radius: 10px;
+  padding: 1.25rem;
+  border-left: 4px solid;
+}
+
+.conduct-item.severity-minor {
+  border-left-color: #4299e1;
+}
+
+.conduct-item.severity-moderate {
+  border-left-color: #ed8936;
+}
+
+.conduct-item.severity-serious,
+.conduct-item.severity-critical {
+  border-left-color: #f56565;
+}
+
+.conduct-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.conduct-title {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.conduct-description {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.conduct-footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+/* Status Update Modal */
+.status-update-modal .modal-content {
+  max-width: 500px;
+}
+
+.status-select-group {
+  margin-bottom: 1.5rem;
+}
+
+.status-select-group label {
+  display: block;
+  color: #4a5568;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.status-select-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.status-reason {
+  margin-bottom: 1.5rem;
+}
+
+.status-reason label {
+  display: block;
+  color: #4a5568;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.status-reason textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Assignment Form */
+.assignment-form-page {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.assignment-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bursaries-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .bursaries-table th,
+  .bursaries-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .alert-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .conduct-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .conduct-footer {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
