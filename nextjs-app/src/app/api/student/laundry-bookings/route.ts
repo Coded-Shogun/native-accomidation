@@ -112,9 +112,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if student is assigned to this property
-    const student = await prisma.student.findUnique({
-      where: { id: session.user.id },
+    // Check if student is assigned to this property via profile
+    if (!session.user.studentProfileId) {
+      return NextResponse.json(
+        { error: 'Student profile not found' },
+        { status: 404 }
+      );
+    }
+
+    const student = await prisma.studentProfile.findUnique({
+      where: { id: session.user.studentProfileId },
       select: { propertyId: true },
     });
 

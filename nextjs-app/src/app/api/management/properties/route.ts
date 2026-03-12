@@ -18,22 +18,23 @@ const propertySchema = z.object({
   postalCode: z.string().min(4).max(10),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  propertyType: z.enum(['residence', 'apartment', 'house', 'shared', 'other']),
-  totalCapacity: z.number().int().min(1),
-  availableRooms: z.number().int().min(0),
-  monthlyRent: z.number().min(0),
+  sphereType: z.enum(['STUDENT_ACCOMMODATION', 'GUEST_HOUSE', 'HOTEL']),
+  totalBeds: z.number().int().min(1),
+  availableBeds: z.number().int().min(0).optional(),
   amenities: z.array(z.string()).optional(),
-  nsfasApproved: z.boolean(),
-  nsfasRegistrationNumber: z.string().optional(),
+  nsfasAccredited: z.boolean().optional(),
+  accreditationNumber: z.string().optional(),
+  accreditationExpiry: z.string().optional(),
+  regulatoryBodyId: z.string().uuid().optional().nullable(),
   managerId: z.string().uuid().optional(),
   contactEmail: z.string().email(),
   contactPhone: z.string(),
-  emergencyContact: z.string(),
-  emergencyPhone: z.string(),
-  checkInTime: z.string().optional(),
-  checkOutTime: z.string().optional(),
-  rules: z.string().max(5000).optional(),
-  description: z.string().max(2000).optional(),
+  contactPerson: z.string(),
+  checkInInstructions: z.string().max(5000).optional(),
+  checkOutInstructions: z.string().max(5000).optional(),
+  houseRules: z.string().max(10000).optional(),
+  paymentGateway: z.enum(['payfast', 'stripe', 'cash_only']).optional(),
+  paymentGatewayConfig: z.any().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check role authorization
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     const where: any = {};
 
     // Managers can only see their assigned properties
-    if (session.user.role === 'manager') {
+    if (session.user.role === 'PROPERTY_MANAGER') {
       where.managerId = session.user.id;
     }
 
@@ -98,11 +99,12 @@ export async function GET(request: NextRequest) {
         take: limit,
         skip: offset,
         include: {
-          manager: {
+          regulatoryBody: {
             select: {
-              firstName: true,
-              lastName: true,
-              email: true,
+              id: true,
+              name: true,
+              code: true,
+              sphereType: true,
             },
           },
           _count: {
@@ -152,7 +154,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Only admins can create properties
-    if (session.user.role !== 'admin') {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -169,23 +171,15 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // Check if NSFAS approved but no registration number
-    if (data.nsfasApproved && !data.nsfasRegistrationNumber) {
-      return NextResponse.json(
-        { error: 'NSFAS registration number required for approved properties' },
-        { status: 400 }
-      );
-    }
-
     // Check if manager exists (if provided)
     if (data.managerId) {
-      const manager = await prisma.manager.findUnique({
+      const manager = await prisma.user.findUnique({
         where: { id: data.managerId },
       });
 
-      if (!manager) {
+      if (!manager || manager.role !== 'PROPERTY_MANAGER') {
         return NextResponse.json(
-          { error: 'Manager not found' },
+          { error: 'Manager not found or not a property manager' },
           { status: 404 }
         );
       }
@@ -195,7 +189,7 @@ export async function POST(request: NextRequest) {
     const property = await prisma.property.create({
       data: {
         ...data,
-        availableRooms: data.totalCapacity, // Initially all rooms available
+        availableBeds: data.availableBeds ?? data.totalBeds,
         isActive: data.isActive ?? true,
       },
       include: {

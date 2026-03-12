@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     const data = validation.data;
 
     // Check if student exists
-    const student = await prisma.student.findUnique({
+    const student = await prisma.studentProfile.findUnique({
       where: { id: data.studentId },
     });
 

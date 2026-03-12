@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Building2,
-  Users,
   DoorOpen,
   DollarSign,
   Wrench,
@@ -17,6 +16,14 @@ import {
   TrendingUp,
   AlertTriangle,
 } from 'lucide-react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts';
 
 async function getDashboardStats() {
   // In production, this would fetch from the API
@@ -48,30 +55,47 @@ export default async function ManagementDashboardPage() {
       color: 'text-blue-600',
     },
     {
-      title: 'Total Students',
-      value: stats?.students.total || 0,
-      icon: Users,
-      description: `${stats?.students.nsfasBeneficiaries || 0} NSFAS`,
-      trend: `${stats?.students.nsfasPercentage || 0}% funded`,
-      color: 'text-green-600',
-    },
-    {
-      title: 'Room Occupancy',
+      title: 'Occupancy Rate',
       value: `${stats?.rooms.occupancyRate || 0}%`,
       icon: DoorOpen,
-      description: `${stats?.rooms.occupied || 0}/${stats?.rooms.total || 0} rooms`,
+      description: `${stats?.rooms.occupied || 0}/${stats?.rooms.total || 0} rooms occupied`,
       trend: `${stats?.rooms.vacant || 0} vacant`,
       color: 'text-purple-600',
     },
     {
-      title: 'Active Bursaries',
-      value: stats?.bursaries.active || 0,
+      title: 'Revenue Today',
+      value: `R${(stats?.revenue?.today || 0).toFixed(2)}`,
       icon: DollarSign,
-      description: `R${((stats?.bursaries.totalAmount || 0) / 1000).toFixed(0)}k total`,
-      trend: 'R45k NSFAS cap',
-      color: 'text-nsfas-green',
+      description: 'Completed payments across all properties',
+      trend: 'Daily collections',
+      color: 'text-emerald-600',
+    },
+    {
+      title: 'Active Bookings',
+      value: stats?.bookings?.active || 0,
+      icon: TrendingUp,
+      description: 'Pending, confirmed & checked-in',
+      trend: 'Across all spheres',
+      color: 'text-sky-600',
     },
   ];
+
+  const sphereData = [
+    {
+      name: 'Student Accommodation',
+      value: stats?.spheres?.STUDENT_ACCOMMODATION || 0,
+    },
+    {
+      name: 'Guest Houses',
+      value: stats?.spheres?.GUEST_HOUSE || 0,
+    },
+    {
+      name: 'Hotels',
+      value: stats?.spheres?.HOTEL || 0,
+    },
+  ].filter((sphere) => sphere.value > 0);
+
+  const sphereColors = ['#2563eb', '#16a34a', '#f59e0b'];
 
   const alertCards = [
     {
@@ -98,11 +122,11 @@ export default async function ManagementDashboardPage() {
   ];
 
   return (
-    <DashboardLayout requiredRole="manager">
+    <DashboardLayout requiredRole="PROPERTY_MANAGER">
       <div className="space-y-6">
         <PageHeader
           heading="Management Dashboard"
-          description="Overview of all properties and students"
+          description="Sphere-neutral overview of properties, occupancy, revenue, and bookings"
         />
 
         {/* Statistics Grid */}
@@ -132,29 +156,68 @@ export default async function ManagementDashboardPage() {
           })}
         </div>
 
-        {/* Alerts Grid */}
-        <div className="grid gap-4 md:grid-cols-3">
-          {alertCards.map((alert) => {
-            const Icon = alert.icon;
-            return (
-              <Card key={alert.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {alert.title}
-                  </CardTitle>
-                  <Icon className={`h-4 w-4 ${alert.color}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{alert.value}</div>
-                  {alert.urgent > 0 && (
-                    <Badge variant="destructive" className="mt-2">
-                      {alert.urgent} urgent
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Sphere Breakdown & Alerts */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>Portfolio by Sphere</CardTitle>
+            </CardHeader>
+            <CardContent className="h-72">
+              {sphereData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={sphereData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={4}
+                    >
+                      {sphereData.map((entry, index) => (
+                        <Cell
+                          // eslint-disable-next-line react/no-array-index-key
+                          key={`sphere-${index}`}
+                          fill={sphereColors[index % sphereColors.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No properties configured yet. Add properties to see a sphere
+                  breakdown.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:col-span-2">
+            {alertCards.map((alert) => {
+              const Icon = alert.icon;
+              return (
+                <Card key={alert.title}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {alert.title}
+                    </CardTitle>
+                    <Icon className={`h-4 w-4 ${alert.color}`} />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{alert.value}</div>
+                    {alert.urgent > 0 && (
+                      <Badge variant="destructive" className="mt-2">
+                        {alert.urgent} urgent
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
         {/* Recent Activity */}

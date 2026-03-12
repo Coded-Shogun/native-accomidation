@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     const where: any = {};
 
     // Managers can only see students at their properties
-    if (session.user.role === 'manager') {
+    if (session.user.role === 'PROPERTY_MANAGER') {
       const managerProperties = await prisma.property.findMany({
         where: { managerId: session.user.id },
         select: { id: true },
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch students
     const [students, total] = await Promise.all([
-      prisma.student.findMany({
+      prisma.studentProfile.findMany({
         where,
         orderBy: { lastName: 'asc' },
         take: limit,
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
           createdAt: true,
         },
       }),
-      prisma.student.count({ where }),
+      prisma.studentProfile.count({ where }),
     ]);
 
     logDataAccess({

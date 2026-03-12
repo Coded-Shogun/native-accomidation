@@ -51,7 +51,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -89,7 +89,7 @@ export async function GET(
     }
 
     // Managers can only access their assigned properties
-    if (session.user.role === 'manager' && property.managerId !== session.user.id) {
+    if (session.user.role === 'PROPERTY_MANAGER' && property.managerId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -138,7 +138,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -169,7 +169,7 @@ export async function PUT(
     }
 
     // Managers can only update their assigned properties
-    if (session.user.role === 'manager' && existingProperty.managerId !== session.user.id) {
+    if (session.user.role === 'PROPERTY_MANAGER' && existingProperty.managerId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -183,13 +183,13 @@ export async function PUT(
 
     // Check if manager exists (if changing)
     if (data.managerId) {
-      const manager = await prisma.manager.findUnique({
+      const manager = await prisma.user.findUnique({
         where: { id: data.managerId },
       });
 
-      if (!manager) {
+      if (!manager || manager.role !== 'PROPERTY_MANAGER') {
         return NextResponse.json(
-          { error: 'Manager not found' },
+          { error: 'Manager not found or not a property manager' },
           { status: 404 }
         );
       }
@@ -258,7 +258,7 @@ export async function DELETE(
     }
 
     // Only admins can delete properties
-    if (session.user.role !== 'admin') {
+    if (session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

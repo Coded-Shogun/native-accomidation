@@ -20,13 +20,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Build property filter for managers
     let propertyFilter: any = {};
-    if (session.user.role === 'manager') {
+    if (session.user.role === 'PROPERTY_MANAGER') {
       const managerProperties = await prisma.property.findMany({
         where: { managerId: session.user.id },
         select: { id: true },
@@ -35,6 +35,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Run all queries in parallel for performance
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date(startOfToday);
+    endOfToday.setDate(endOfToday.getDate() + 1);
+
     const [
       // Properties
       totalProperties,
@@ -45,7 +50,7 @@ export async function GET(request: NextRequest) {
       occupiedRooms,
       vacantRooms,
 
-      // Students
+      // Students (student accommodation specific)
       totalStudents,
       activeStudents,
       nsfasStudents,
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
       activeLeases,
       expiringLeases,
 
-      // Bursaries
+      // Bursaries (student accommodation specific)
       activeBursaries,
       totalBursaryAmount,
 
@@ -69,49 +74,54 @@ export async function GET(request: NextRequest) {
       // Recent activity
       recentMaintenanceRequests,
       recentComplaints,
+
+      // Multi-sphere metrics
+      activeBookings,
+      paymentsTodayAggregate,
+      sphereTypeGroups,
     ] = await Promise.all([
       // Properties stats
       prisma.property.count({
-        where: session.user.role === 'manager' ? { id: propertyFilter } : {},
+        where: session.user.role === 'PROPERTY_MANAGER' ? { id: propertyFilter } : {},
       }),
       prisma.property.count({
         where: {
           isActive: true,
-          ...(session.user.role === 'manager' ? { id: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { id: propertyFilter } : {}),
         },
       }),
 
       // Rooms stats
       prisma.room.count({
-        where: session.user.role === 'manager' ? { propertyId: propertyFilter } : {},
+        where: session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {},
       }),
       prisma.room.count({
         where: {
           occupancyStatus: 'occupied',
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
       prisma.room.count({
         where: {
           occupancyStatus: 'vacant',
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
 
       // Students stats
-      prisma.student.count({
-        where: session.user.role === 'manager' ? { propertyId: propertyFilter } : {},
+      prisma.studentProfile.count({
+        where: session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {},
       }),
-      prisma.student.count({
+      prisma.studentProfile.count({
         where: {
           accountStatus: 'active',
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
-      prisma.student.count({
+      prisma.studentProfile.count({
         where: {
           nsfasBeneficiary: true,
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
 
@@ -119,7 +129,7 @@ export async function GET(request: NextRequest) {
       prisma.lease.count({
         where: {
           leaseStatus: 'active',
-          ...(session.user.role === 'manager' ? {
+          ...(session.user.role === 'PROPERTY_MANAGER' ? {
             room: { propertyId: propertyFilter },
           } : {}),
         },
@@ -131,7 +141,7 @@ export async function GET(request: NextRequest) {
             gte: new Date(),
             lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
           },
-          ...(session.user.role === 'manager' ? {
+          ...(session.user.role === 'PROPERTY_MANAGER' ? {
             room: { propertyId: propertyFilter },
           } : {}),
         },
@@ -141,7 +151,7 @@ export async function GET(request: NextRequest) {
       prisma.studentBursary.count({
         where: {
           status: 'active',
-          ...(session.user.role === 'manager' ? {
+          ...(session.user.role === 'PROPERTY_MANAGER' ? {
             student: { propertyId: propertyFilter },
           } : {}),
         },
@@ -149,7 +159,7 @@ export async function GET(request: NextRequest) {
       prisma.studentBursary.aggregate({
         where: {
           status: 'active',
-          ...(session.user.role === 'manager' ? {
+          ...(session.user.role === 'PROPERTY_MANAGER' ? {
             student: { propertyId: propertyFilter },
           } : {}),
         },
@@ -160,14 +170,14 @@ export async function GET(request: NextRequest) {
       prisma.maintenanceRequest.count({
         where: {
           status: { in: ['submitted', 'acknowledged'] },
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
       prisma.maintenanceRequest.count({
         where: {
           urgency: { in: ['high', 'emergency'] },
           status: { notIn: ['completed', 'cancelled'] },
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
 
@@ -175,20 +185,20 @@ export async function GET(request: NextRequest) {
       prisma.complaint.count({
         where: {
           status: { in: ['submitted', 'under_review', 'investigating'] },
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
       prisma.complaint.count({
         where: {
           severity: 'critical',
           status: { notIn: ['resolved', 'closed'] },
-          ...(session.user.role === 'manager' ? { propertyId: propertyFilter } : {}),
+          ...(session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {}),
         },
       }),
 
       // Recent activity
       prisma.maintenanceRequest.findMany({
-        where: session.user.role === 'manager' ? { propertyId: propertyFilter } : {},
+        where: session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {},
         orderBy: { createdAt: 'desc' },
         take: 5,
         select: {
@@ -207,7 +217,7 @@ export async function GET(request: NextRequest) {
         },
       }),
       prisma.complaint.findMany({
-        where: session.user.role === 'manager' ? { propertyId: propertyFilter } : {},
+        where: session.user.role === 'PROPERTY_MANAGER' ? { propertyId: propertyFilter } : {},
         orderBy: { createdAt: 'desc' },
         take: 5,
         select: {
@@ -225,11 +235,68 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
+
+      // Active bookings across all spheres
+      prisma.booking.count({
+        where: {
+          status: {
+            in: ['pending', 'confirmed', 'checked_in'],
+          },
+          ...(session.user.role === 'PROPERTY_MANAGER'
+            ? { propertyId: propertyFilter }
+            : {}),
+        },
+      }),
+
+      // Revenue today (lease payments) for occupied properties
+      prisma.payment.aggregate({
+        where: {
+          paymentStatus: 'completed',
+          paymentDate: {
+            gte: startOfToday,
+            lt: endOfToday,
+          },
+          ...(session.user.role === 'PROPERTY_MANAGER'
+            ? {
+                lease: {
+                  propertyId: propertyFilter,
+                },
+              }
+            : {}),
+        },
+        _sum: { amount: true },
+      }),
+
+      // Property counts by sphere type for donut chart
+      prisma.property.groupBy({
+        by: ['sphereType'],
+        _count: {
+          _all: true,
+        },
+        where:
+          session.user.role === 'PROPERTY_MANAGER'
+            ? {
+                id: propertyFilter,
+              }
+            : {},
+      }),
     ]);
 
     // Calculate derived metrics
     const occupancyRate = totalRooms > 0 ? (occupiedRooms / totalRooms) * 100 : 0;
     const nsfasPercentage = totalStudents > 0 ? (nsfasStudents / totalStudents) * 100 : 0;
+
+    const revenueToday = paymentsTodayAggregate._sum.amount || 0;
+
+    const sphereBreakdown: Record<string, number> = {
+      STUDENT_ACCOMMODATION: 0,
+      GUEST_HOUSE: 0,
+      HOTEL: 0,
+    };
+
+    for (const group of sphereTypeGroups) {
+      sphereBreakdown[group.sphereType] = group._count._all;
+    }
 
     const stats = {
       properties: {
@@ -255,6 +322,17 @@ export async function GET(request: NextRequest) {
       bursaries: {
         active: activeBursaries,
         totalAmount: totalBursaryAmount._sum.amount || 0,
+      },
+      bookings: {
+        active: activeBookings,
+      },
+      revenue: {
+        today: revenueToday,
+      },
+      spheres: {
+        STUDENT_ACCOMMODATION: sphereBreakdown.STUDENT_ACCOMMODATION,
+        GUEST_HOUSE: sphereBreakdown.GUEST_HOUSE,
+        HOTEL: sphereBreakdown.HOTEL,
       },
       maintenance: {
         pending: pendingMaintenanceRequests,

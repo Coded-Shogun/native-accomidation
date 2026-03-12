@@ -27,8 +27,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type SidebarRole = 'ADMIN' | 'PROPERTY_MANAGER' | 'FRONT_DESK' | 'STUDENT' | 'GUEST' | 'RESIDENT';
+
 interface SidebarProps {
-  role: 'admin' | 'manager' | 'student';
+  role: SidebarRole;
 }
 
 const managementLinks = [
@@ -43,19 +45,24 @@ const managementLinks = [
     icon: Building2,
   },
   {
-    title: 'Students',
-    href: '/management/students',
+    title: 'Guests',
+    href: '/management/guests',
     icon: Users,
+  },
+  {
+    title: 'Bookings',
+    href: '/management/bookings',
+    icon: CalendarDays,
+  },
+  {
+    title: 'Services',
+    href: '/management/services',
+    icon: ShoppingCart,
   },
   {
     title: 'Rooms',
     href: '/management/rooms',
     icon: DoorOpen,
-  },
-  {
-    title: 'Leases',
-    href: '/management/leases',
-    icon: FileText,
   },
   {
     title: 'Bursaries',
@@ -73,13 +80,23 @@ const managementLinks = [
     icon: MessageSquare,
   },
   {
-    title: 'Reports',
-    href: '/management/reports',
+    title: 'Front Desk',
+    href: '/management/front-desk',
+    icon: MessageSquare,
+  },
+  {
+    title: 'Floor Plans',
+    href: '/management/floor-plan',
+    icon: FileText,
+  },
+  {
+    title: 'POS Reports',
+    href: '/management/pos-reports',
     icon: BarChart3,
   },
   {
-    title: 'Settings',
-    href: '/management/settings',
+    title: 'Regulatory',
+    href: '/management/settings/regulatory',
     icon: Settings,
   },
 ];
@@ -134,7 +151,8 @@ const studentLinks = [
 
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
-  const links = role === 'student' ? studentLinks : managementLinks;
+  const links =
+    role === 'STUDENT' || role === 'RESIDENT' ? studentLinks : managementLinks;
 
   return (
     <aside className="fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] w-64 border-r bg-background">

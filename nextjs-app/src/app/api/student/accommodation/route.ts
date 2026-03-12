@@ -20,9 +20,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get student record
-    const student = await prisma.student.findUnique({
-      where: { id: session.user.id },
+    // Get student profile via session.user.studentProfileId
+    if (!session.user.studentProfileId) {
+      return NextResponse.json({ error: 'Student profile not found' }, { status: 404 });
+    }
+
+    const student = await prisma.studentProfile.findUnique({
+      where: { id: session.user.studentProfileId },
       select: {
         id: true,
         firstName: true,

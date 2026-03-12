@@ -39,14 +39,14 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const studentId = params.id;
 
     // Fetch student with details
-    const student = await prisma.student.findUnique({
+    const student = await prisma.studentProfile.findUnique({
       where: { id: studentId },
       include: {
         property: {
@@ -69,7 +69,7 @@ export async function GET(
     }
 
     // Managers can only access students at their properties
-    if (session.user.role === 'manager' && student.property?.managerId !== session.user.id) {
+    if (session.user.role === 'PROPERTY_MANAGER' && student.property?.managerId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -173,7 +173,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -192,7 +192,7 @@ export async function PUT(
     const data = validation.data;
 
     // Check if student exists
-    const existingStudent = await prisma.student.findUnique({
+    const existingStudent = await prisma.studentProfile.findUnique({
       where: { id: studentId },
       include: {
         property: {
@@ -211,13 +211,13 @@ export async function PUT(
     }
 
     // Managers can only update students at their properties
-    if (session.user.role === 'manager' && existingStudent.property?.managerId !== session.user.id) {
+    if (session.user.role === 'PROPERTY_MANAGER' && existingStudent.property?.managerId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Check if email is being changed and is unique
     if (data.email && data.email !== existingStudent.email) {
-      const emailExists = await prisma.student.findUnique({
+      const emailExists = await prisma.studentProfile.findUnique({
         where: { email: data.email },
       });
 
@@ -249,7 +249,7 @@ export async function PUT(
     }
 
     // Update student
-    const updatedStudent = await prisma.student.update({
+    const updatedStudent = await prisma.studentProfile.update({
       where: { id: studentId },
       data,
       include: {

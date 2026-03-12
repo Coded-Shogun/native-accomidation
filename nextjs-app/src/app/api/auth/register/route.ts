@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // Check if email already exists
-    const existingEmail = await prisma.student.findUnique({
+    // Check if email already exists on user
+    const existingEmail = await prisma.user.findUnique({
       where: { email: data.email },
     });
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if student number already exists
-    const existingStudentNumber = await prisma.student.findUnique({
+    const existingStudentNumber = await prisma.studentProfile.findUnique({
       where: { studentNumber: data.studentNumber },
     });
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if ID number already exists
-    const existingIdNumber = await prisma.student.findUnique({
+    const existingIdNumber = await prisma.studentProfile.findUnique({
       where: { idNumber: data.idNumber },
     });
 
@@ -108,37 +108,53 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hashPassword(data.password);
 
-    // Create student record
-    const student = await prisma.student.create({
-      data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        idNumber: data.idNumber,
-        dateOfBirth: new Date(data.dateOfBirth),
-        universityName: data.universityName,
-        courseOfStudy: data.courseOfStudy,
-        yearOfStudy: parseInt(data.yearOfStudy),
-        studentNumber: data.studentNumber,
-        homeAddress: data.homeAddress,
-        homeCity: data.homeCity,
-        homeProvince: data.homeProvince,
-        homePostalCode: data.homePostalCode,
-        emergencyContactName: data.emergencyContactName,
-        emergencyContactPhone: data.emergencyContactPhone,
-        emergencyRelationship: data.emergencyRelationship,
-        nsfasBeneficiary: data.nsfasBeneficiary,
-        nsfasReference: data.nsfasReference || null,
-        accountStatus: 'active',
-      },
+    // Create user + student profile in a transaction
+    const { user, studentProfile } = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          email: data.email,
+          passwordHash,
+          name: `${data.firstName} ${data.lastName}`.trim(),
+          phone: data.phone,
+          role: 'STUDENT',
+          status: 'active',
+        },
+      });
+
+      const createdStudentProfile = await tx.studentProfile.create({
+        data: {
+          userId: createdUser.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          idNumber: data.idNumber,
+          dateOfBirth: new Date(data.dateOfBirth),
+          universityName: data.universityName,
+          courseOfStudy: data.courseOfStudy,
+          yearOfStudy: parseInt(data.yearOfStudy),
+          studentNumber: data.studentNumber,
+          homeAddress: data.homeAddress,
+          homeCity: data.homeCity,
+          homeProvince: data.homeProvince,
+          homePostalCode: data.homePostalCode,
+          emergencyContactName: data.emergencyContactName,
+          emergencyContactPhone: data.emergencyContactPhone,
+          emergencyRelationship: data.emergencyRelationship,
+          nsfasBeneficiary: data.nsfasBeneficiary,
+          nsfasReference: data.nsfasReference || null,
+          accountStatus: 'active',
+        },
+      });
+
+      return { user: createdUser, studentProfile: createdStudentProfile };
     });
 
     // Audit log
     logAudit({
       action: 'CREATE',
       resource: 'student',
-      resourceId: student.id,
+      resourceId: studentProfile.id,
       success: true,
       ipAddress: request.headers.get('x-forwarded-for') || undefined,
       userAgent: request.headers.get('user-agent') || undefined,
@@ -149,9 +165,10 @@ export async function POST(request: NextRequest) {
       {
         message: 'Registration successful',
         student: {
-          id: student.id,
-          email: student.email,
-          studentNumber: student.studentNumber,
+          id: studentProfile.id,
+          email: studentProfile.email,
+          studentNumber: studentProfile.studentNumber,
+          userId: user.id,
         },
       },
       { status: 201 }

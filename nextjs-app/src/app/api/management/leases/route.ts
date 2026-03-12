@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const where: any = {};
 
     // Managers can only see leases at their properties
-    if (session.user.role === 'manager') {
+    if (session.user.role === 'PROPERTY_MANAGER') {
       const managerProperties = await prisma.property.findMany({
         where: { managerId: session.user.id },
         select: { id: true },
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!['admin', 'manager'].includes(session.user.role)) {
+    if (!['ADMIN', 'PROPERTY_MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if student exists
-    const student = await prisma.student.findUnique({
+    const student = await prisma.studentProfile.findUnique({
       where: { id: data.studentId },
     });
 
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Managers can only create leases at their properties
-    if (session.user.role === 'manager' && room.property.managerId !== session.user.id) {
+    if (session.user.role === 'PROPERTY_MANAGER' && room.property.managerId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -290,7 +290,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Update student property assignment
-      await tx.student.update({
+      await tx.studentProfile.update({
         where: { id: data.studentId },
         data: { propertyId: room.propertyId },
       });

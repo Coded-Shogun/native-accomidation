@@ -10,7 +10,7 @@ import { Sidebar } from './sidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'manager' | 'student';
+  requiredRole?: 'ADMIN' | 'PROPERTY_MANAGER' | 'FRONT_DESK' | 'STUDENT' | 'GUEST' | 'RESIDENT';
 }
 
 export async function DashboardLayout({
@@ -26,8 +26,7 @@ export async function DashboardLayout({
 
   // Check role authorization
   if (requiredRole && session.user.role !== requiredRole) {
-    // Allow admin to access manager views
-    if (!(session.user.role === 'admin' && requiredRole === 'manager')) {
+    if (!(session.user.role === 'ADMIN' && requiredRole === 'PROPERTY_MANAGER')) {
       redirect('/unauthorized');
     }
   }
@@ -38,11 +37,11 @@ export async function DashboardLayout({
         user={{
           name: session.user.name || session.user.email || 'User',
           email: session.user.email || '',
-          role: session.user.role || 'user',
+          role: session.user.role || 'USER',
         }}
       />
       <div className="flex">
-        <Sidebar role={session.user.role as 'admin' | 'manager' | 'student'} />
+        <Sidebar role={session.user.role as any} />
         <main className="flex-1 pl-64">
           <div className="container py-6">{children}</div>
         </main>

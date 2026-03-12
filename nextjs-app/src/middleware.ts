@@ -12,29 +12,14 @@ const routeAccess = {
   // Public routes (no authentication required)
   public: ['/login', '/register', '/auth/error', '/api/auth'],
 
-  // Student routes
+  // Student & resident self-service routes
   student: ['/student', '/api/student'],
 
-  // Manager routes
-  manager: [
-    '/properties',
-    '/students',
-    '/maintenance',
-    '/compliance',
-    '/access',
-    '/api/properties',
-    '/api/students',
-    '/api/maintenance',
-    '/api/compliance',
-    '/api/access',
-  ],
+  // Management routes
+  management: ['/management', '/api/management'],
 
-  // Admin routes (includes all manager routes + admin-specific)
-  admin: [
-    '/bursary',
-    '/api/management',
-    '/admin',
-  ],
+  // Front desk routes
+  frontDesk: ['/front-desk', '/api/front-desk'],
 };
 
 export async function middleware(request: NextRequest) {
@@ -71,25 +56,25 @@ export async function middleware(request: NextRequest) {
 
   const { role } = session.user;
 
-  // Check student routes
+  // Student / resident routes
   if (routeAccess.student.some((route) => pathname.startsWith(route))) {
-    if (role === 'student' || role === 'manager' || role === 'admin') {
+    if (['STUDENT', 'RESIDENT', 'PROPERTY_MANAGER', 'ADMIN'].includes(role)) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
-  // Check manager routes
-  if (routeAccess.manager.some((route) => pathname.startsWith(route))) {
-    if (role === 'manager' || role === 'admin') {
+  // Management routes
+  if (routeAccess.management.some((route) => pathname.startsWith(route))) {
+    if (['PROPERTY_MANAGER', 'ADMIN'].includes(role)) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
-  // Check admin routes
-  if (routeAccess.admin.some((route) => pathname.startsWith(route))) {
-    if (role === 'admin') {
+  // Front desk routes
+  if (routeAccess.frontDesk.some((route) => pathname.startsWith(route))) {
+    if (['FRONT_DESK', 'PROPERTY_MANAGER', 'ADMIN'].includes(role)) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL('/unauthorized', request.url));

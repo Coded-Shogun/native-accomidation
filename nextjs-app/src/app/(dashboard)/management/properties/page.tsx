@@ -39,7 +39,7 @@ export default async function PropertiesPage() {
   const { properties, total } = await getProperties();
 
   return (
-    <DashboardLayout requiredRole="manager">
+    <DashboardLayout requiredRole="PROPERTY_MANAGER">
       <div className="space-y-6">
         <PageHeader
           heading="Properties"
@@ -61,7 +61,8 @@ export default async function PropertiesPage() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Location</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Sphere</TableHead>
+                    <TableHead>Regulator</TableHead>
                     <TableHead>Capacity</TableHead>
                     <TableHead>Occupancy</TableHead>
                     <TableHead>NSFAS</TableHead>
@@ -82,7 +83,18 @@ export default async function PropertiesPage() {
                         </div>
                       </TableCell>
                       <TableCell className="capitalize">
-                        {property.propertyType}
+                        {property.sphereType?.replace('_', ' ').toLowerCase() || 'n/a'}
+                      </TableCell>
+                      <TableCell>
+                        {property.regulatoryBody?.name ? (
+                          <span className="text-sm text-muted-foreground">
+                            {property.regulatoryBody.name}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">
+                            None
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">

@@ -10,21 +10,22 @@ import { prisma } from '@/lib/db';
 import { verifyPassword } from '@/lib/security';
 import { logSecurityEvent } from '@/lib/logger';
 import { z } from 'zod';
+import type { UserRole } from '@prisma/client';
 
 // Extend default session types
 declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      role: 'admin' | 'manager' | 'student';
-      studentNumber?: string;
+      role: UserRole;
+      studentProfileId?: string;
       propertyId?: string;
     } & DefaultSession['user'];
   }
 
   interface User {
-    role: 'admin' | 'manager' | 'student';
-    studentNumber?: string;
+    role: UserRole;
+    studentProfileId?: string;
     propertyId?: string;
   }
 }
@@ -32,8 +33,8 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
-    role: 'admin' | 'manager' | 'student';
-    studentNumber?: string;
+    role: UserRole;
+    studentProfileId?: string;
     propertyId?: string;
   }
 }
@@ -77,21 +78,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const { email, password } = result.data;
 
-          // Find user (student)
-          const student = await prisma.student.findUnique({
+          // Find user
+          const user = await prisma.user.findUnique({
             where: { email },
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              studentNumber: true,
-              propertyId: true,
-              accountStatus: true,
+            include: {
+              studentProfile: {
+                select: {
+                  id: true,
+                  studentNumber: true,
+                  accountStatus: true,
+                  propertyId: true,
+                },
+              },
             },
           });
 
-          if (!student) {
+          if (!user) {
             logSecurityEvent({
               type: 'failed_login',
               details: { reason: 'User not found', email },
@@ -100,12 +102,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          // Check account status
-          if (student.accountStatus !== 'active') {
+          // Check account status (for students) or generic status for other roles
+          const accountStatus =
+            user.studentProfile?.accountStatus ?? user.status ?? 'active';
+          if (accountStatus !== 'active') {
             logSecurityEvent({
               type: 'failed_login',
-              userId: student.id,
-              details: { reason: 'Account not active', status: student.accountStatus },
+              userId: user.id,
+              details: { reason: 'Account not active', status: accountStatus },
               ipAddress: req.headers?.['x-forwarded-for'] as string,
             });
             return null;
@@ -114,17 +118,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // For demo purposes, we'll create a simple password check
           // In production, you should have a password field in the database
           // For now, we'll use a demo password hash
-          const demoPasswordHash = await import('bcryptjs').then(bcrypt =>
-            bcrypt.hash('password123', 12)
-          );
-
-          // Verify password (replace with actual password field)
-          const isValid = await verifyPassword(password, demoPasswordHash);
+          const passwordHash = user.passwordHash;
+          const isValid = passwordHash
+            ? await verifyPassword(password, passwordHash)
+            : false;
 
           if (!isValid) {
             logSecurityEvent({
               type: 'failed_login',
-              userId: student.id,
+              userId: user.id,
               details: { reason: 'Invalid password', email },
               ipAddress: req.headers?.['x-forwarded-for'] as string,
             });
@@ -134,22 +136,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // Successful login
           logSecurityEvent({
             type: 'login',
-            userId: student.id,
+            userId: user.id,
             details: { email },
             ipAddress: req.headers?.['x-forwarded-for'] as string,
           });
 
-          // Determine role (simplified logic)
-          const role = email.includes('admin') ? 'admin' :
-                      email.includes('manager') ? 'manager' : 'student';
-
           return {
-            id: student.id,
-            email: student.email,
-            name: `${student.firstName} ${student.lastName}`,
-            role,
-            studentNumber: student.studentNumber,
-            propertyId: student.propertyId || undefined,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            studentProfileId: user.studentProfile?.id,
+            propertyId: user.studentProfile?.propertyId ?? user.propertyId ?? undefined,
           };
         } catch (error) {
           console.error('Authorization error:', error);
@@ -164,7 +162,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.studentNumber = user.studentNumber;
+        token.studentProfileId = user.studentProfileId;
         token.propertyId = user.propertyId;
       }
 
@@ -179,14 +177,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
-        session.user.studentNumber = token.studentNumber;
+        session.user.studentProfileId = token.studentProfileId;
         session.user.propertyId = token.propertyId;
       }
 
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect to appropriate dashboard based on role
+      // Preserve explicit callback URLs
       if (url.startsWith('/')) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;

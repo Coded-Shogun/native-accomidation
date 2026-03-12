@@ -265,7 +265,7 @@ export async function getDatabaseStats(): Promise<any> {
     leaseCount,
     bursaryCount,
   ] = await Promise.all([
-    prisma.student.count(),
+    prisma.studentProfile.count(),
     prisma.property.count(),
     prisma.lease.count(),
     prisma.studentBursary.count(),
